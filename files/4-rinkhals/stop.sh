@@ -2,7 +2,7 @@
 
 function log() {
     echo "${*}"
-    echo "`date`: ${*}" >> rinkhals.log
+    echo "`date`: ${*}" >> /useremain/rinkhals/.current/rinkhals.log
 }
 function kill_by_name() {
     for i in `ls /proc/*/cmdline 2> /dev/null`; do
@@ -18,7 +18,7 @@ function kill_by_name() {
 
 
 if [ ! -d /useremain/rinkhals/.current ]; then
-    echo Rinkhals has not started version $RINKHALS_VERSION does not exist
+    echo Rinkhals has not started
     exit 1
 fi
 
@@ -36,24 +36,32 @@ kill_by_name mjpg_streamer
 ################
 log "> Cleaning chroot..."
 
-umount ./proc 2> /dev/null
-umount ./sys 2> /dev/null
-umount ./dev 2> /dev/null
-umount ./run 2> /dev/null
-umount ./tmp 2> /dev/null
-umount ./userdata 2> /dev/null
-umount ./useremain 2> /dev/null
+cd /useremain/rinkhals/.current
 
-rm -rf ./proc
-rm -rf ./sys
-rm -rf ./dev
-rm -rf ./run
-rm -rf ./userdata
-rm -rf ./useremain
+umount -f ./proc 2> /dev/null
+umount -f ./sys 2> /dev/null
+umount -f ./dev 2> /dev/null
+umount -f ./run 2> /dev/null
+umount -f ./tmp 2> /dev/null
+umount -f ./userdata 2> /dev/null
+umount -f ./useremain 2> /dev/null
+
+# rm -rf ./proc
+# rm -rf ./sys
+# rm -rf ./dev
+# rm -rf ./run
+# rm -rf ./userdata
+# rm -rf ./useremain
 
 
 ################
 log "> Restarting default environment..."
 
+rm -rf /useremain/rinkhals/.current
+
+touch /useremain/rinkhals/.disable-rinkhals
+
 cd /userdata/app/gk
 ./restart_k3c.sh
+
+rm /useremain/rinkhals/.disable-rinkhals

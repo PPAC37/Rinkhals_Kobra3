@@ -41,9 +41,25 @@ function check_by_port() {
 ################
 log "> Starting Moonraker..."
 
+# Moonraker uses /userdata/app/gk/printer_data
+# Here we replace /userdata/app/gk/printer_data with ./home/rinkhals/printer_data
 mkdir -p /userdata/app/gk/printer_data
 umount /userdata/app/gk/printer_data 2> /dev/null
 mount --bind /home/rinkhals/printer_data /userdata/app/gk/printer_data
+
+# But we keep gcodes in /useremain/app/gk/gcodes
+umount /userdata/app/gk/printer_data/gcodes 2> /dev/null
+mount --bind /useremain/app/gk/gcodes /userdata/app/gk/printer_data/gcodes
+
+# We keep Moonraker database in /useremain/app/gk/database
+mkdir -p /useremain/app/gk/database
+umount /userdata/app/gk/printer_data/database 2> /dev/null
+mount --bind /useremain/app/gk/database /userdata/app/gk/printer_data/database
+
+# And we expose default config to users
+mkdir -p /userdata/app/gk/printer_data/config/default
+umount /userdata/app/gk/printer_data/config/default 2> /dev/null
+mount --bind /userdata/app/gk /userdata/app/gk/printer_data/database
 
 kill_by_name moonraker.py
 HOME=/userdata/app/gk /usr/bin/python /usr/share/moonraker/moonraker/moonraker.py >> /moonraker.log &
